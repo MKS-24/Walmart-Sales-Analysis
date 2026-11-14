@@ -9,7 +9,7 @@ An end-to-end data analytics and predictive machine learning system for Walmart 
 
 ---
 
-## 📌 Project Overview
+## Project Overview
 
 Forecasting retail sales accurately across diverse geographic stores and merchandise departments is vital for retail enterprises to:
 - **Prevent Stockouts & Overstock:** Align inventory replenishment with demand spikes.
@@ -23,7 +23,7 @@ This project delivers:
 
 ---
 
-## 🗂️ Repository Structure
+## Repository Structure
 
 ```bash
 ├── Webpage/                      # Production Vercel Serverless Web Application
@@ -60,7 +60,7 @@ This project delivers:
 
 ---
 
-## 📊 Exploratory Data Analysis & Key Visualizations
+## Exploratory Data Analysis & Key Visualizations
 
 The analytics scripts generate three key visual reports stored in `outputs/`:
 
@@ -78,7 +78,7 @@ The analytics scripts generate three key visual reports stored in `outputs/`:
 
 ---
 
-## ⚙️ Data Preprocessing & Feature Engineering
+## Data Preprocessing & Feature Engineering
 
 To ensure robust generalization without lookahead bias or data leakage:
 
