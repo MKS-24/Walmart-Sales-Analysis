@@ -94,7 +94,7 @@ To ensure robust generalization without lookahead bias or data leakage:
 
 ---
 
-## 🤖 Machine Learning Model Benchmarks
+## Machine Learning Model Benchmarks
 
 Models were evaluated on the chronological out-of-time test set. In addition to standard regression metrics (**MAE**, **RMSE**, and **$R^2$**), performance was measured using Walmart's competition metric:
 $$\text{WMAE} = \frac{\sum w_i |y_i - \hat{y}_i|}{\sum w_i}$$
