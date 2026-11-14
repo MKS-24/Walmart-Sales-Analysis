@@ -124,7 +124,6 @@ The machine learning model is deployed as a real-time serverless web application
 - **Store Profiling:** Automatic metadata lookup across all 45 Walmart stores (Store Type & Size).
 - **Interactive Scenarios:** One-click presets for major retail peaks (Black Friday, Christmas, and Regular Summer weeks).
 - **Macroeconomic & Discount Inputs:** Dynamic tuning of CPI, Fuel Prices, Unemployment rates, and promotional MarkDowns.
-- 
 ---
 
 ## Local Usage & Inference
