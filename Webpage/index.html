@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Walmart Retail Sales AI Predictor</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        screens: {
+          'xs': '420px',
+          'sm': '640px',
+          'md': '768px',
+          'lg': '1024px',
+          'xl': '1280px',
+        },
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            walmart: {
+              blue: '#0071dc',
+              dark: '#004f9a',
+              yellow: '#ffc220',
+              accent: '#e6f1fc'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body {
+      overflow-x: hidden;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background: radial-gradient(circle at top right, #f4f8fd, #ebf3fb, #f8fafc);
+      min-height: 100dvh;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 4px 20px -2px rgba(0, 79, 154, 0.05), 0 2px 8px -2px rgba(0, 79, 154, 0.03);
+    }
+    .stat-glow {
+      box-shadow: 0 0 35px rgba(0, 113, 220, 0.12);
+    }
+    /* Smooth custom scrollbars for mobile tables & presets */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased font-sans flex flex-col justify-between">
+
+  <!-- Responsive Navigation Bar -->
+  <header class="border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+      
+      <!-- Brand Logo & Title -->
+      <div class="flex items-center space-x-2.5 min-w-0">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-walmart-blue flex items-center justify-center text-walmart-yellow text-lg sm:text-xl shadow-md shadow-blue-500/20">
+          <i class="ph-bold ph-sparkle"></i>
+        </div>
+        <div class="truncate">
+          <span class="font-extrabold text-base sm:text-xl tracking-tight text-slate-900 block truncate">
+            Walmart<span class="text-walmart-blue">Sales</span>.AI
+          </span>
+        </div>
+      </div>
+      
+      <!-- Model Badge -->
+      <div class="shrink-0 flex items-center">
+        <div class="flex items-center space-x-1.5 sm:space-x-2 text-[11px] sm:text-xs font-semibold text-emerald-800 bg-emerald-50 px-2.5 sm:px-3 py-1 rounded-full border border-emerald-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="hidden xs:inline">Model: <strong>HistGradBoost (97.2% R²)</strong></span>
+          <span class="xs:hidden"><strong>97.2% R²</strong></span>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 sm:space-y-8 flex-1 w-full">
+    
+    <!-- Hero / Headline & Presets -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Retail Weekly Sales Predictor</h1>
+        <p class="text-slate-500 text-xs sm:text-sm mt-0.5">Real-time machine learning inference for store sales, holiday impacts, and economic drivers.</p>
+      </div>
+      
+      <!-- Presets (Horizontal Scrollable on Small Mobile) -->
+      <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar pb-1 pt-1 -mx-3.5 px-3.5 sm:mx-0 sm:px-0">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">Presets:</span>
+        <button onclick="applyPreset('blackfriday')" class="text-xs font-semibold px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-walmart-blue hover:text-walmart-blue transition shadow-sm shrink-0 flex items-center space-x-1.5 active:scale-95">
+          <i class="ph-fill ph-tag text-amber-500"></i>
+          <span>Black Friday</span>
+        </button>
+        <button onclick="applyPreset('christmas')" class="text-xs font-semibold px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-walmart-blue hover:text-walmart-blue transition shadow-sm shrink-0 flex items-center space-x-1.5 active:scale-95">
+          <i class="ph-fill ph-tree text-emerald-500"></i>
+          <span>Christmas Peak</span>
+        </button>
+        <button onclick="applyPreset('summer')" class="text-xs font-semibold px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-walmart-blue hover:text-walmart-blue transition shadow-sm shrink-0 flex items-center space-x-1.5 active:scale-95">
+          <i class="ph-fill ph-sun text-yellow-500"></i>
+          <span>Summer Week</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Responsive Grid: Form (7 cols on lg) vs Prediction Card (5 cols on lg) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+      
+      <!-- Left Column: Form (Order 1 on Desktop, Stacks on Mobile) -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="glass-card rounded-2xl p-4 sm:p-7 shadow-sm">
+          
+          <form id="predictionForm" class="space-y-5 sm:space-y-6" onsubmit="event.preventDefault(); predictSales();">
+            
+            <!-- Store & Department Section -->
+            <div>
+              <div class="flex items-center space-x-2 mb-3.5">
+                <i class="ph-bold ph-storefront text-walmart-blue text-lg"></i>
+                <h3 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider">Store & Department Profile</h3>
+              </div>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Store Identifier</label>
+                  <select id="storeSelect" onchange="onStoreChange()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:ring-2 focus:ring-walmart-blue focus:border-walmart-blue outline-none transition cursor-pointer">
+                    <!-- Populated dynamically via JS -->
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Department ID</label>
+                  <div class="relative">
+                    <input type="number" id="deptInput" value="92" min="1" max="99" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:ring-2 focus:ring-walmart-blue focus:border-walmart-blue outline-none transition">
+                    <span class="absolute right-2.5 top-2.5 text-[11px] font-semibold text-slate-400 pointer-events-none">Dept 92 = Top Sales</span>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:contents">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Store Type</label>
+                    <input type="text" id="typeInput" value="A" readonly class="w-full bg-slate-100 border border-slate-200 text-slate-600 rounded-xl px-3 py-2.5 text-sm font-bold cursor-not-allowed text-center sm:text-left">
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Size (sq. ft.)</label>
+                    <input type="text" id="sizeInput" value="151,315" readonly class="w-full bg-slate-100 border border-slate-200 text-slate-600 rounded-xl px-3 py-2.5 text-sm font-semibold cursor-not-allowed text-center sm:text-left">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Date & Holiday Section -->
+            <div class="pt-3 border-t border-slate-100">
+              <div class="flex items-center space-x-2 mb-3.5">
+                <i class="ph-bold ph-calendar-blank text-walmart-blue text-lg"></i>
+                <h3 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider">Timeline & Holiday Event</h3>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 items-center">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Target Forecast Date</label>
+                  <input type="date" id="dateInput" value="2012-11-23" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:ring-2 focus:ring-walmart-blue focus:border-walmart-blue outline-none transition">
+                </div>
+
+                <div>
+                  <label class="flex items-center space-x-3 bg-blue-50/60 p-3 rounded-xl border border-blue-100 cursor-pointer hover:bg-blue-50 transition active:scale-[0.99]">
+                    <input type="checkbox" id="holidayInput" checked class="w-5 h-5 rounded text-walmart-blue focus:ring-walmart-blue border-slate-300">
+                    <div class="min-w-0">
+                      <span class="text-xs sm:text-sm font-bold text-slate-900 block truncate">Holiday Surge Week?</span>
+                      <span class="text-[11px] text-slate-500 block truncate">Thanksgiving, Christmas, Super Bowl</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Economic Indicators -->
+            <div class="pt-3 border-t border-slate-100">
+              <div class="flex items-center space-x-2 mb-3.5">
+                <i class="ph-bold ph-chart-line-up text-walmart-blue text-lg"></i>
+                <h3 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider">Macroeconomic Factors</h3>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+                <div>
+                  <label class="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Temp (°F)</label>
+                  <input type="number" step="0.1" id="tempInput" value="55.0" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs sm:text-sm font-medium">
+                </div>
+                <div>
+                  <label class="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Fuel Price ($)</label>
+                  <input type="number" step="0.01" id="fuelInput" value="3.50" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs sm:text-sm font-medium">
+                </div>
+                <div>
+                  <label class="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">CPI Index</label>
+                  <input type="number" step="0.1" id="cpiInput" value="220.0" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs sm:text-sm font-medium">
+                </div>
+                <div>
+                  <label class="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Unemployment (%)</label>
+                  <input type="number" step="0.1" id="unempInput" value="7.2" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs sm:text-sm font-medium">
+                </div>
+              </div>
+            </div>
+
+            <!-- Optional MarkDowns Accordion -->
+            <div class="pt-3 border-t border-slate-100">
+              <details class="group">
+                <summary class="flex justify-between items-center cursor-pointer text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-walmart-blue py-1">
+                  <span class="flex items-center space-x-1.5">
+                    <i class="ph-bold ph-tag-chevron text-base"></i>
+                    <span>Promotional MarkDowns (Optional)</span>
+                  </span>
+                  <i class="ph ph-caret-down group-open:rotate-180 transition-transform"></i>
+                </summary>
+                <div class="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 gap-2 mt-3 pt-2">
+                  <div>
+                    <label class="block text-[10px] font-semibold text-slate-500">MD 1 ($)</label>
+                    <input type="number" id="md1Input" value="5000" class="w-full bg-slate-50 border border-slate-300 rounded-md p-1.5 text-xs">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-semibold text-slate-500">MD 2 ($)</label>
+                    <input type="number" id="md2Input" value="200" class="w-full bg-slate-50 border border-slate-300 rounded-md p-1.5 text-xs">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-semibold text-slate-500">MD 3 ($)</label>
+                    <input type="number" id="md3Input" value="3000" class="w-full bg-slate-50 border border-slate-300 rounded-md p-1.5 text-xs">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-semibold text-slate-500">MD 4 ($)</label>
+                    <input type="number" id="md4Input" value="1500" class="w-full bg-slate-50 border border-slate-300 rounded-md p-1.5 text-xs">
+                  </div>
+                  <div class="col-span-2 xs:col-span-1">
+                    <label class="block text-[10px] font-semibold text-slate-500">MD 5 ($)</label>
+                    <input type="number" id="md5Input" value="4000" class="w-full bg-slate-50 border border-slate-300 rounded-md p-1.5 text-xs">
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="predictBtn" class="w-full py-3.5 px-6 rounded-xl bg-walmart-blue hover:bg-walmart-dark text-white font-bold text-sm sm:text-base shadow-lg shadow-blue-500/25 transition duration-150 flex items-center justify-center space-x-2 active:scale-[0.99] touch-manipulation">
+              <i class="ph-bold ph-lightning text-walmart-yellow text-xl"></i>
+              <span>Generate Sales Forecast</span>
+            </button>
+
+          </form>
+
+        </div>
+      </div>
+
+      <!-- Right Column: Prediction Output & Model Telemetry (Sticky on Desktop) -->
+      <div id="predictionOutputSection" class="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
+        
+        <!-- Live Prediction Display Card -->
+        <div class="glass-card stat-glow rounded-2xl p-5 sm:p-7 relative overflow-hidden border-blue-200">
+          <div class="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-blue-100/50 blur-2xl pointer-events-none"></div>
+
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Prediction Outcome</span>
+            <span id="holidayBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Holiday Week</span>
+          </div>
+
+          <div class="my-5 sm:my-6">
+            <span class="text-xs font-semibold text-slate-500 block">Forecasted Weekly Revenue</span>
+            <div id="resultAmount" class="text-3xl xs:text-4xl sm:text-5xl font-black text-walmart-blue tracking-tight mt-1 break-words">
+              $177,609.19
+            </div>
+            <div id="comparisonText" class="mt-2 text-xs font-medium text-emerald-600 flex items-center space-x-1">
+              <i class="ph-bold ph-arrow-up-right"></i>
+              <span>High-volume holiday projection</span>
+            </div>
+          </div>
+
+          <!-- Secondary Metrics -->
+          <div class="grid grid-cols-2 gap-2.5 sm:gap-3 pt-3.5 border-t border-slate-100">
+            <div class="p-3 rounded-xl bg-slate-50/80 border border-slate-100">
+              <span class="text-[11px] font-semibold text-slate-400 block truncate">Historical Avg</span>
+              <span id="histAvgText" class="text-sm sm:text-base font-bold text-slate-800 block truncate">$135,210.40</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50/80 border border-slate-100">
+              <span class="text-[11px] font-semibold text-slate-400 block truncate">Model Accuracy</span>
+              <span class="text-sm sm:text-base font-bold text-emerald-600 block truncate">97.2% (R²)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Telemetry & Benchmark Table Card -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6 shadow-sm space-y-3.5">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center space-x-2">
+            <i class="ph-bold ph-cpu text-walmart-blue text-base"></i>
+            <span>Model Comparison Telemetry</span>
+          </h4>
+
+          <div class="overflow-x-auto no-scrollbar -mx-2 px-2 sm:mx-0 sm:px-0">
+            <table class="w-full text-left text-xs min-w-[280px]">
+              <thead>
+                <tr class="text-slate-400 border-b border-slate-100 font-semibold">
+                  <th class="pb-2">Algorithm</th>
+                  <th class="pb-2">MAE</th>
+                  <th class="pb-2">R²</th>
+                  <th class="pb-2">WMAE</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 font-medium">
+                <tr class="text-slate-600">
+                  <td class="py-2">Ridge (Baseline)</td>
+                  <td class="py-2">$2,849</td>
+                  <td class="py-2">94.1%</td>
+                  <td class="py-2">$2,919</td>
+                </tr>
+                <tr class="text-slate-600">
+                  <td class="py-2">Random Forest</td>
+                  <td class="py-2">$2,009</td>
+                  <td class="py-2">96.6%</td>
+                  <td class="py-2">$2,033</td>
+                </tr>
+                <tr class="text-walmart-blue font-bold bg-blue-50/70 rounded">
+                  <td class="py-2 pl-1.5 flex items-center space-x-1">
+                    <i class="ph-fill ph-check-circle text-emerald-500"></i>
+                    <span>HistGradBoost</span>
+                  </td>
+                  <td class="py-2">$1,889</td>
+                  <td class="py-2">97.2%</td>
+                  <td class="py-2">$1,937</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-normal">
+            *Evaluated on out-of-time chronological test split (84,314 rows). WMAE weights holiday weeks 5x.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200/80 bg-white/70 py-4 mt-8">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400">
+      Walmart Sales Forecasting Model • Powered by Scikit-Learn & Vercel Serverless
+    </div>
+  </footer>
+
+  <!-- Store Metadata Database (Embedded for 0-latency auto-filling) -->
+  <script>
+    const STORE_METADATA = {
+      1: { type: 'A', size: 151315 },
+      2: { type: 'A', size: 202307 },
+      3: { type: 'B', size: 37392 },
+      4: { type: 'A', size: 205863 },
+      5: { type: 'B', size: 34875 },
+      6: { type: 'A', size: 202505 },
+      7: { type: 'B', size: 70713 },
+      8: { type: 'A', size: 155078 },
+      9: { type: 'B', size: 125833 },
+      10: { type: 'B', size: 126512 },
+      11: { type: 'A', size: 207499 },
+      12: { type: 'B', size: 112238 },
+      13: { type: 'A', size: 219622 },
+      14: { type: 'A', size: 200898 },
+      15: { type: 'B', size: 123737 },
+      16: { type: 'B', size: 57197 },
+      17: { type: 'B', size: 93188 },
+      18: { type: 'B', size: 120653 },
+      19: { type: 'A', size: 203819 },
+      20: { type: 'A', size: 203742 },
+      21: { type: 'B', size: 140167 },
+      22: { type: 'B', size: 119557 },
+      23: { type: 'B', size: 114533 },
+      24: { type: 'A', size: 203819 },
+      25: { type: 'B', size: 128107 },
+      26: { type: 'A', size: 152513 },
+      27: { type: 'A', size: 204184 },
+      28: { type: 'A', size: 206302 },
+      29: { type: 'B', size: 93638 },
+      30: { type: 'C', size: 42988 },
+      31: { type: 'A', size: 203750 },
+      32: { type: 'A', size: 203007 },
+      33: { type: 'A', size: 39690 },
+      34: { type: 'A', size: 158114 },
+      35: { type: 'B', size: 103681 },
+      36: { type: 'A', size: 39910 },
+      37: { type: 'C', size: 39910 },
+      38: { type: 'C', size: 39690 },
+      39: { type: 'A', size: 184109 },
+      40: { type: 'A', size: 155083 },
+      41: { type: 'A', size: 196321 },
+      42: { type: 'C', size: 39690 },
+      43: { type: 'C', size: 41062 },
+      44: { type: 'C', size: 39910 },
+      45: { type: 'B', size: 118221 }
+    };
+
+    // Populate Store Select Dropdown
+    const storeSelect = document.getElementById('storeSelect');
+    for (let s = 1; s <= 45; s++) {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = `Store #${s} (Type ${STORE_METADATA[s].type})`;
+      storeSelect.appendChild(opt);
+    }
+
+    function onStoreChange() {
+      const storeId = parseInt(storeSelect.value);
+      const meta = STORE_METADATA[storeId] || { type: 'A', size: 150000 };
+      document.getElementById('typeInput').value = meta.type;
+      document.getElementById('sizeInput').value = meta.size.toLocaleString();
+    }
+
+    // Presets
+    function applyPreset(name) {
+      if (name === 'blackfriday') {
+        storeSelect.value = 1;
+        document.getElementById('deptInput').value = 92;
+        document.getElementById('dateInput').value = '2012-11-23';
+        document.getElementById('holidayInput').checked = true;
+        document.getElementById('tempInput').value = 55.0;
+        document.getElementById('md1Input').value = 8000;
+        document.getElementById('md3Input').value = 5000;
+      } else if (name === 'christmas') {
+        storeSelect.value = 20;
+        document.getElementById('deptInput').value = 95;
+        document.getElementById('dateInput').value = '2012-12-21';
+        document.getElementById('holidayInput').checked = true;
+        document.getElementById('tempInput').value = 35.0;
+        document.getElementById('md1Input').value = 12000;
+        document.getElementById('md3Input').value = 7500;
+      } else if (name === 'summer') {
+        storeSelect.value = 10;
+        document.getElementById('deptInput').value = 1;
+        document.getElementById('dateInput').value = '2012-07-13';
+        document.getElementById('holidayInput').checked = false;
+        document.getElementById('tempInput').value = 85.0;
+        document.getElementById('md1Input').value = 0;
+        document.getElementById('md3Input').value = 0;
+      }
+      onStoreChange();
+      predictSales();
+    }
+
+    // Call Vercel API endpoint `/api/predict`
+    async function predictSales() {
+      const btn = document.getElementById('predictBtn');
+      const store = parseInt(storeSelect.value);
+      const dept = parseInt(document.getElementById('deptInput').value);
+      const isHoliday = document.getElementById('holidayInput').checked ? 1 : 0;
+      const date = document.getElementById('dateInput').value;
+      const type = document.getElementById('typeInput').value;
+      const size = parseInt(document.getElementById('sizeInput').value.replace(/,/g, ''));
+      const temp = parseFloat(document.getElementById('tempInput').value);
+      const fuel = parseFloat(document.getElementById('fuelInput').value);
+      const cpi = parseFloat(document.getElementById('cpiInput').value);
+      const unemp = parseFloat(document.getElementById('unempInput').value);
+      const md1 = parseFloat(document.getElementById('md1Input').value) || 0;
+      const md2 = parseFloat(document.getElementById('md2Input').value) || 0;
+      const md3 = parseFloat(document.getElementById('md3Input').value) || 0;
+      const md4 = parseFloat(document.getElementById('md4Input').value) || 0;
+      const md5 = parseFloat(document.getElementById('md5Input').value) || 0;
+
+      const payload = {
+        Store: store,
+        Dept: dept,
+        Date: date,
+        IsHoliday: isHoliday,
+        Type: type,
+        Size: size,
+        Temperature: temp,
+        Fuel_Price: fuel,
+        CPI: cpi,
+        Unemployment: unemp,
+        MarkDown1: md1,
+        MarkDown2: md2,
+        MarkDown3: md3,
+        MarkDown4: md4,
+        MarkDown5: md5
+      };
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin text-xl"></i><span>Forecasting...</span>`;
+
+      try {
+        const response = await fetch('/api/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const predVal = data.predicted_weekly_sales;
+
+        document.getElementById('resultAmount').innerText = `$${predVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        
+        if (data.historical_avg) {
+          document.getElementById('histAvgText').innerText = `$${data.historical_avg.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        const holidayBadge = document.getElementById('holidayBadge');
+        if (isHoliday) {
+          holidayBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800';
+          holidayBadge.innerText = 'Holiday Surge Week';
+        } else {
+          holidayBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600';
+          holidayBadge.innerText = 'Standard Operating Week';
+        }
+
+      } catch (err) {
+        console.warn('API call fallback mode active:', err);
+        // Fallback approximation for offline local inspection
+        let base = (size * 0.12) + (dept === 92 ? 120000 : dept === 95 ? 90000 : 25000);
+        if (isHoliday) base *= 1.35;
+        document.getElementById('resultAmount').innerText = `$${base.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.getElementById('comparisonText').innerHTML = `<span class="text-amber-600">Simulated projection (Deploy to Vercel for live model serverless API)</span>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="ph-bold ph-lightning text-walmart-yellow text-xl"></i><span>Generate Sales Forecast</span>`;
+        
+        // On mobile devices, smoothly scroll down so user sees result immediately
+        if (window.innerWidth < 1024) {
+          document.getElementById('predictionOutputSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    }
+
+    // Initialize defaults on page load
+    onStoreChange();
+  </script>
+
+</body>
+</html>
