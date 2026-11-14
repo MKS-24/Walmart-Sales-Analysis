@@ -113,19 +113,18 @@ where $w_i = 5$ for holiday weeks and $1$ for regular weeks.
 - **Inference Efficiency:** Lightweight 1.4 MB serialized bundle with sub-second prediction latency.
 
 ---
+## Live Interactive Web Application
 
-## Deploying to Vercel (Step-by-Step)
+The machine learning model is deployed as a real-time serverless web application:
 
-The `Webpage/` directory is self-contained and pre-configured for **1-click Vercel Serverless deployment**:
+ **[Launch Live Forecasting Demo](https://walmart-sales-analysis.vercel.app/)** *(Apna final Vercel URL yahan paste kar dein)*
 
-1. **Log in to Vercel:** Go to [vercel.com](https://vercel.com) and click **"Add New..."** → **"Project"**.
-2. **Import Repository:** Select this GitHub repository (`MKS-24/Walmart-Sales` or your repo name).
-3. **Configure Root Directory (IMPORTANT):**
-   - Under **Root Directory**, click **"Edit"**.
-   - Type or select: `Webpage`
-4. **Deploy:** Click **"Deploy"**.
-5. Within 30–60 seconds, your interactive sales forecasting dashboard will be live at `https://<your-project>.vercel.app`!
-
+### Key Features of the Web App:
+- **Instant Inference:** Sub-second sales predictions using the trained HistGradientBoosting model.
+- **Store Profiling:** Automatic metadata lookup across all 45 Walmart stores (Store Type & Size).
+- **Interactive Scenarios:** One-click presets for major retail peaks (Black Friday, Christmas, and Regular Summer weeks).
+- **Macroeconomic & Discount Inputs:** Dynamic tuning of CPI, Fuel Prices, Unemployment rates, and promotional MarkDowns.
+- 
 ---
 
 ## Local Usage & Inference
