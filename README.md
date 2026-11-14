@@ -26,7 +26,7 @@ This project delivers:
 ## 🗂️ Repository Structure
 
 ```bash
-├── Webpage/                      # 🌐 Production Vercel Serverless Web Application
+├── Webpage/                      # Production Vercel Serverless Web Application
 │   ├── api/
 │   │   ├── predict.py            # Vercel Python serverless handler (/api/predict)
 │   │   └── best_walmart_model.joblib # Serialized ML model bundle (HistGradientBoosting)
@@ -36,20 +36,20 @@ This project delivers:
 │   ├── requirements.txt          # Python dependencies for Vercel runtime
 │   └── vercel.json               # Vercel routing and serverless configuration
 │
-├── data/                         # 📊 Raw and processed datasets
+├── data/                         # Raw and processed datasets
 │   ├── features.csv              # Macroeconomic indicators (CPI, Fuel, Markdowns, etc.)
 │   ├── stores.csv                # Store metadata (Store Type, Square Footage)
 │   ├── train.csv                 # Historical weekly sales records (421,570 rows)
 │   └── test.csv                  # Test set for out-of-sample evaluation
 │
-├── notebooks/                    # 📓 Interactive Jupyter notebooks for EDA & prototyping
+├── notebooks/                    # Interactive Jupyter notebooks for EDA & prototyping
 │
-├── outputs/                      # 🖼️ High-resolution diagnostic visualizations
+├── outputs/                      # High-resolution diagnostic visualizations
 │   ├── 1_Walmart Sales.png       # Store-level and aggregate monthly sales trends
 │   ├── 2_Walmart Sales.png       # 3-month & 6-month rolling averages (trend smoothing)
 │   └── 3_Walmart Sales.png       # Seasonality surge & Top 5 revenue-generating departments
 │
-├── scripts/                      # 🐍 Data pipelines and ML model training scripts
+├── scripts/                      # Data pipelines and ML model training scripts
 │   ├── Merge_data_sets.py        # Dataset joiner and merger
 │   ├── Code.py                   # Exploratory analysis & visualization generation
 │   └── ml_model.py               # ML training, evaluation, and benchmark pipeline
@@ -106,7 +106,7 @@ where $w_i = 5$ for holiday weeks and $1$ for regular weeks.
 | **Random Forest Regressor** (50 trees, depth 16) | \$2,009.32 | \$4,035.18 | 96.62% | \$2,033.86 | Ensemble |
 | **HistGradientBoostingRegressor** (Tuned) | **\$1,889.68** | **\$3,676.67** | **97.20%** | **\$1,937.20** | 🏆 **Best Model** |
 
-### 🏆 Best Model: HistGradientBoostingRegressor
+### Best Model: HistGradientBoostingRegressor
 - **Accuracy:** Explains **97.2%** of sales variance on unseen future dates ($R^2 = 0.972$).
 - **Low Error:** Mean Absolute Error of **\$1,889.68** on a dataset with an average weekly sales baseline of ~\$16,000.
 - **Weighted Holiday Robustness:** Achieves a **\$1,937.20 WMAE**, confirming superior performance during high-volatility holiday periods.
@@ -114,7 +114,7 @@ where $w_i = 5$ for holiday weeks and $1$ for regular weeks.
 
 ---
 
-## 🌐 Deploying to Vercel (Step-by-Step)
+## Deploying to Vercel (Step-by-Step)
 
 The `Webpage/` directory is self-contained and pre-configured for **1-click Vercel Serverless deployment**:
 
@@ -128,7 +128,7 @@ The `Webpage/` directory is self-contained and pre-configured for **1-click Verc
 
 ---
 
-## 💻 Local Usage & Inference
+## Local Usage & Inference
 
 ### 1. Install Dependencies
 ```bash
@@ -174,7 +174,7 @@ print(f"Predicted Weekly Sales: ${predicted_sales:,.2f}")
 
 ---
 
-## 📈 Strategic Business Recommendations
+## Strategic Business Recommendations
 
 1. **Advance Holiday Inventory Buffers:** Predictable seasonal surges in December and February necessitate inventory ramp-up starting 4–6 weeks prior.
 2. **Prioritize Tier-1 Departments:** Direct supply chain and marketing resources toward dominant departments (such as **Dept 92** and **Dept 95**) to maximize top-line revenue.
