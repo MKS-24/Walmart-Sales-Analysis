@@ -117,7 +117,7 @@ where $w_i = 5$ for holiday weeks and $1$ for regular weeks.
 
 The machine learning model is deployed as a real-time serverless web application:
 
- **[Launch Live Forecasting Demo](https://walmart-sales-analysis.vercel.app/)** *(Apna final Vercel URL yahan paste kar dein)*
+ **[Launch Live Forecasting Demo](https://walmart-sales-analysis.vercel.app/)**
 
 ### Key Features of the Web App:
 - **Instant Inference:** Sub-second sales predictions using the trained HistGradientBoosting model.
